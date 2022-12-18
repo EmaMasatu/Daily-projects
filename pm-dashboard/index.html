@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Management Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <!-- Add a container for the dashboard -->
+    <div class="dashboard">
+
+        <!-- Add a section for adding new properties -->
+        <div class="dashboard-section">
+            <h2>Add New Property</h2>
+            <p>
+                <label for="name">Name:</label><br>
+                <input type="text" id="name" name="name">
+            </p>
+            <p>
+                <label for="address">Address:</label><br>
+                <input type="text" id="address" name="address">
+            </p>
+            <p>
+                <button id="add-property-button">Add Property</button>
+            </p>
+        </div>
+
+        <!-- Add a section for viewing the property list -->
+        <div class="dashboard-section">
+            <h2>Property List</h2>
+            <table id="property-list">
+                <tr>
+                    <th>Name</th>
+                    <th>Address</th>
+                </tr>
+            </table>
+        </div>
+
+
+    </div>
+
+    <script>
+        // Get references to the DOM elements we will be using
+        const addPropertyButton = document.getElementById('add-property-button');
+        const nameInput = document.getElementById('name');
+        const addressInput = document.getElementById('address');
+        const propertyList = document.getElementById('property-list');
+
+        // Create an array to store the properties 
+        const properties = [];
+
+        // Add a click event listerner to the add property button
+        addPropertyButton.addEventListener('click', () => {
+            // Get the values from the input fields
+        })
+    </script>
+
+
+</body>
+</html>
