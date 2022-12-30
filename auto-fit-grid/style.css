@@ -1,0 +1,23 @@
+body{
+    background: rgb(165, 101, 214);
+}
+
+.wrapper{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    border: 2px solid rgb(183, 196, 199);
+    
+}
+.q{
+    background: rgb(144, 0, 255);
+    margin: 5px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    color: #fff;
+    font-size: 25px;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    border-radius: 4px;
+}
