@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Ocean Ripples</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #0077be, #001f3f);
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="oceanCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('oceanCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let ripples = [];
+
+        function drawOcean() {
+            ctx.fillStyle = 'rgba(0, 119, 190, 0.5)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawRipples() {
+            for (let i = 0; i < ripples.length; i++) {
+                let ripple = ripples[i];
+                ctx.beginPath();
+                ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${ripple.opacity})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.closePath();
+                
+                ripple.radius += 2;
+                ripple.opacity -= 0.02;
+                if (ripple.opacity <= 0) {
+                    ripples.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawOcean();
+            drawRipples();
+            requestAnimationFrame(animate);
+        }
+
+        canvas.addEventListener('mousemove', (event) => {
+            ripples.push({ x: event.clientX, y: event.clientY, radius: 5, opacity: 1 });
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        animate();
+    </script>
+</body>
+</html>
