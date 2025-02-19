@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #004466;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="oceanCanvas"></canvas>
+    <div class="content">
+        <h1>Interactive Ocean</h1>
+        <p>Move your cursor to create ripples</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('oceanCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // Ripple class
+        class Ripple {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 0;
+                this.maxRadius = 100;
+                this.opacity = 1;
+                this.speed = 3;
+            }
+
+            update() {
+                this.radius += this.speed;
+                this.opacity = 1 - (this.radius / this.maxRadius);
+                return this.radius <= this.maxRadius;
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        // Ocean wave background
+        class Ocean {
+            constructor() {
+                this.waves = [];
+                this.ripples = [];
+                this.time = 0;
+                this.mouseX = 0;
+                this.mouseY = 0;
+            }
+
+            addRipple(x, y) {
+                this.ripples.push(new Ripple(x, y));
+            }
+
+            update() {
+                this.time += 0.02;
+                
+                // Update ripples
+                this.ripples = this.ripples.filter(ripple => ripple.update());
+                
+                // Generate wave points
+                this.waves = [];
+                for (let x = 0; x <= canvas.width; x += 20) {
+                    for (let y = 0; y <= canvas.height; y += 20) {
+                        const distX = this.mouseX - x;
+                        const distY = this.mouseY - y;
+                        const dist = Math.sqrt(distX * distX + distY * distY);
+                        
+                        let wave = Math.sin(x * 0.02 + this.time) * 
+                                 Math.cos(y * 0.02 + this.time) * 2;
+                        
+                        // Add cursor influence
+                        if (dist < 100) {
+                            wave += (100 - dist) * 0.1;
+                        }
+                        
+                        this.waves.push({
+                            x: x,
+                            y: y,
+                            height: wave
+                        });
+                    }
+                }
+            }
+
+            draw() {
+                // Clear canvas
+                ctx.fillStyle = '#004466';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw waves
+                ctx.fillStyle = '#006699';
+                for (const wave of this.waves) {
+                    ctx.beginPath();
+                    ctx.arc(wave.x, wave.y + wave.height, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Draw ripples
+                for (const ripple of this.ripples) {
+                    ripple.draw(ctx);
+                }
+            }
+        }
+
+        const ocean = new Ocean();
+
+        // Mouse movement handler
+        canvas.addEventListener('mousemove', (e) => {
+            ocean.mouseX = e.clientX;
+            ocean.mouseY = e.clientY;
+            if (Math.random() < 0.1) { // Only create ripples occasionally
+                ocean.addRipple(e.clientX, e.clientY);
+            }
+        });
+
+        // Animation loop
+        function animate() {
+            ocean.update();
+            ocean.draw();
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
