@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant Analog Clock</title>
+    <style>
+        /* Previous styles remain the same until .number */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #1a1a1a, #2c3e50);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .clock {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 60px rgba(0, 0, 0, 0.3),
+                inset 0 0 40px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .clock::before {
+            content: '';
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            background: linear-gradient(45deg, #e91e63, #3498db);
+            border-radius: 50%;
+            z-index: -1;
+            animation: pulse 2s linear infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1.02); opacity: 0.8; }
+            50% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.02); opacity: 0.8; }
+        }
+
+        .number-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .clock .number {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            font-size: 1.5rem;
+            color: #fff;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            transform: translate(-50%, -50%);
+            font-weight: 500;
+        }
+
+        .clock .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            z-index: 10;
+            transition: all 0.05s cubic-bezier(0.4, 2.2, 0.3, 1);
+        }
+
+        .clock::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            z-index: 11;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .clock .hand.hour {
+            width: 8px;
+            height: 25%;
+            background: #ff9800;
+            transform: rotate(var(--rotation));
+        }
+
+        .clock .hand.minute {
+            width: 6px;
+            height: 35%;
+            background: #03a9f4;
+            transform: rotate(var(--rotation));
+        }
+
+        .clock .hand.second {
+            width: 2px;
+            height: 40%;
+            background: #e91e63;
+            transform: rotate(var(--rotation));
+        }
+
+        .digital-time {
+            position: absolute;
+            bottom: 30%;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 15px;
+            border-radius: 15px;
+        }
+
+        .marks {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .marks div {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            left: 49.9%;
+        }
+
+        .marks div::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        @media (max-width: 500px) {
+            .clock {
+                width: 300px;
+                height: 300px;
+            }
+            .clock::before {
+                width: 320px;
+                height: 320px;
+            }
+            .clock .number {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="clock">
+        <div class="marks">
+            <!-- Generate 60 minute marks -->
+        </div>
+        <div class="hand hour"></div>
+        <div class="hand minute"></div>
+        <div class="hand second"></div>
+        <div class="digital-time"></div>
+        <div class="number-container"></div>
+    </div>
+
+    <script>
+        const numberContainer = document.querySelector('.number-container');
+        const clockSize = 400;
+        const radius = clockSize * 0.38; // Adjusted radius for better positioning
+
+        // Position numbers
+        for (let i = 1; i <= 12; i++) {
+            const number = document.createElement('div');
+            number.className = 'number';
+            number.textContent = i;
+            
+            // Calculate position on the circle
+            const angle = (i * 30 - 90) * (Math.PI / 180); // -90 to start at 12 o'clock
+            const x = radius * Math.cos(angle) + clockSize/2;
+            const y = radius * Math.sin(angle) + clockSize/2;
+            
+            // Position the number with transform for better centering
+            number.style.left = `${x}px`;
+            number.style.top = `${y}px`;
+            
+            numberContainer.appendChild(number);
+        }
+
+        // Generate minute marks
+        const marks = document.querySelector('.marks');
+        for (let i = 0; i < 60; i++) {
+            const mark = document.createElement('div');
+            mark.style.transform = `rotate(${i * 6}deg)`;
+            marks.appendChild(mark);
+        }
+
+        function setClock() {
+            const now = new Date();
+            const secondsRatio = now.getSeconds() / 60;
+            const minutesRatio = (secondsRatio + now.getMinutes()) / 60;
+            const hoursRatio = (minutesRatio + now.getHours()) / 12;
+
+            setRotation(document.querySelector('.hand.second'), secondsRatio);
+            setRotation(document.querySelector('.hand.minute'), minutesRatio);
+            setRotation(document.querySelector('.hand.hour'), hoursRatio);
+
+            // Update digital time
+            const digitalTime = document.querySelector('.digital-time');
+            digitalTime.textContent = now.toLocaleTimeString();
+        }
+
+        function setRotation(element, rotationRatio) {
+            element.style.setProperty('--rotation', rotationRatio * 360 + 'deg');
+        }
+
+        // Update clock every 50ms for smooth movement
+        setInterval(setClock, 50);
+        setClock(); // Initial call
+    </script>
+</body>
+</html>
